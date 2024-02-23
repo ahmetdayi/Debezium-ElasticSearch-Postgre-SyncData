@@ -29,6 +29,6 @@ public class ElasticProductController {
     }
     @GetMapping("/search/{query}")
     public ResponseEntity<List<ElasticProductResponse>> search(@PathVariable String query){
-        return new ResponseEntity<>(elasticProductService.findByNameIgnoreCaseLikeAndUnitStockLikeAndElasticCategoryListNameLikeAndNameContaining(query), HttpStatus.OK);
+        return new ResponseEntity<>(elasticProductService.search(query), HttpStatus.OK);
     }
 }

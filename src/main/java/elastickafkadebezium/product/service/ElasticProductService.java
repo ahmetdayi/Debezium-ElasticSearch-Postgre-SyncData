@@ -52,8 +52,17 @@ public class ElasticProductService {
     public List<ElasticProductResponse> findByCategoryName(String categoryName){
         return elasticProductConverter.convert(elasticProductRepository.findByElasticCategoryListNameLike(categoryName));
     }
-    public List<ElasticProductResponse>
-    findByNameIgnoreCaseLikeAndUnitStockLikeAndElasticCategoryListNameLikeAndNameContaining(String query){
+
+    /**
+     * @param query
+     * findByNameIgnoreCaseLike
+     * UnitStockLike
+     * UnitStockContaining
+     * ElasticCategoryListNameLike
+     * ElasticCategoryListNameContaining
+     * NameContaining
+     */
+    public List<ElasticProductResponse> search(String query){
         List<ElasticProduct> a = elasticProductRepository
                 .findByNameIgnoreCaseLikeOrUnitStockLikeOrUnitStockContainingOrElasticCategoryListNameLikeOrElasticCategoryListNameContainingOrNameContaining
                         (query, query, query, query,query,query);

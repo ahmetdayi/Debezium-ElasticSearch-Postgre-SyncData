@@ -13,17 +13,18 @@ import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
+
 @Component
 @RequiredArgsConstructor
-public class KafkaErrorConsumer {
+public class KafkaUpdatedErrorConsumer {
 
     private final KafkaPublisher kafkaPublisher;
-    private static final String ORDER_CREATE_KAFKA_CONSUMER_ERROR = "product-created.kafkaconsumer.error";
+    private static final String ORDER_CREATE_KAFKA_CONSUMER_ERROR = "product-updated.kafkaconsumer.error";
     private static final Map<String, Integer> retryCountsByTopicNames = new HashMap<>();
     private static final String RETRY_COUNT_KEY = "retryCount";
     private static final String ERROR_KEY = ".error";
     private static final String RETRY_KEY = ".retry";
-    private static final String GROUP_ID = "KafkaRetryJob-GroupId";
+    private static final String GROUP_ID = "KafkaUpdatedRetryJob-GroupId";
     private final ObjectMapper MAPPER = new ObjectMapper();
 
 

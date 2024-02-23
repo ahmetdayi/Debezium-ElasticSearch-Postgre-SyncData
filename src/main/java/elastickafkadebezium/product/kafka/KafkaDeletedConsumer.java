@@ -1,39 +1,27 @@
 package elastickafkadebezium.product.kafka;
 
 
-import elastickafkadebezium.product.model.ElasticProduct;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import elastickafkadebezium.product.request.KafkaPayload;
-import elastickafkadebezium.product.service.ElasticCategoryService;
 import elastickafkadebezium.product.service.ElasticProductService;
 import elastickafkadebezium.product.service.OutboxService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.stereotype.Component;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import lombok.RequiredArgsConstructor;
-
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
-import java.net.ConnectException;
-
 @Component
 @RequiredArgsConstructor
-public class KafkaConsumer {
-    private static final String TOPIC_NAME = "product-created";
-    private static final String RETRY_TOPIC_NAME = "product-created.kafkaconsumer.retry";
-    private static final String ERROR_TOPIC_NAME = "product-created.kafkaconsumer.error";
-    private static final String GROUP_ID = "GroupId";
+public class KafkaDeletedConsumer {
+    private static final String TOPIC_NAME = "product-deleted";
+    private static final String RETRY_TOPIC_NAME = "product-deleted.kafkaconsumer.retry";
+    private static final String ERROR_TOPIC_NAME = "product-deleted.kafkaconsumer.error";
+    private static final String GROUP_ID = "DeletedGroupId";
 
 
     private final ElasticProductService elasticProductService;
-    private final ElasticCategoryService elasticCategoryService;
     private final OutboxService outboxService;
     private final KafkaPublisher kafkaPublisher;
     private final ObjectMapper MAPPER = new ObjectMapper();
@@ -53,9 +41,8 @@ public class KafkaConsumer {
             // JSON'dan KafkaPayload nesnesine donusturme islemi
             KafkaPayload kafkaPayload = MAPPER.readValue(text, KafkaPayload.class);
 
-            // elastice verileri kaydetme
-            elasticCategoryService.createAll(kafkaPayload);
-            elasticProductService.create(kafkaPayload);
+            // elastice verileri silme
+            elasticProductService.delete(kafkaPayload);
 
             //elastice kaydedilen veriler bir hata olmazsa siliniyor
             outboxService.deleteByProductId(text);
@@ -77,8 +64,8 @@ public class KafkaConsumer {
         try {
             // JSON'dan KafkaPayload nesnesine donusturme islemi
             KafkaPayload kafkaPayload = MAPPER.readValue(text, KafkaPayload.class);
-            elasticCategoryService.createAll(kafkaPayload);
-            elasticProductService.create(kafkaPayload);
+            // elastice verileri silme
+            elasticProductService.delete(kafkaPayload);
 
         }catch (Exception e){
             kafkaPublisher.publish(ERROR_TOPIC_NAME, text);

@@ -4,7 +4,6 @@ package elastickafkadebezium.product.kafka;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import elastickafkadebezium.product.request.KafkaPayload;
-import elastickafkadebezium.product.service.ElasticCategoryService;
 import elastickafkadebezium.product.service.ElasticProductService;
 import elastickafkadebezium.product.service.OutboxService;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +22,7 @@ public class KafkaCreatedConsumer {
 
 
     private final ElasticProductService elasticProductService;
-    private final ElasticCategoryService elasticCategoryService;
+
     private final OutboxService outboxService;
     private final KafkaPublisher kafkaPublisher;
     private final ObjectMapper MAPPER = new ObjectMapper();
@@ -65,7 +64,6 @@ public class KafkaCreatedConsumer {
         try {
             // JSON'dan KafkaPayload nesnesine donusturme islemi
             KafkaPayload kafkaPayload = MAPPER.readValue(text, KafkaPayload.class);
-            elasticCategoryService.createAll(kafkaPayload);
             elasticProductService.create(kafkaPayload);
 
         }catch (Exception e){

@@ -29,7 +29,6 @@ public class ElasticProductService {
         elasticProductRepository.save(elasticProduct);
     }
 
-    //TODO sadece category listesini gunellemek istediginde hata olusabilir
     public void update(KafkaPayload kafkaPayload){
         ElasticProduct elasticProduct = findById(kafkaPayload.id());
         elasticProduct.setName(kafkaPayload.name().trim().isEmpty() ? elasticProduct.getName() : kafkaPayload.name());
@@ -48,6 +47,18 @@ public class ElasticProductService {
 
     public List<ElasticProductResponse> findAll(){
         return elasticProductConverter.convert(StreamSupport.stream(elasticProductRepository.findAll().spliterator(), false).toList());
+    }
+
+    public List<ElasticProductResponse> findByCategoryName(String categoryName){
+        return elasticProductConverter.convert(elasticProductRepository.findByElasticCategoryListNameLike(categoryName));
+    }
+    public List<ElasticProductResponse>
+    findByNameIgnoreCaseLikeAndUnitStockLikeAndElasticCategoryListNameLikeAndNameContaining(String query){
+        List<ElasticProduct> a = elasticProductRepository
+                .findByNameIgnoreCaseLikeOrUnitStockLikeOrUnitStockContainingOrElasticCategoryListNameLikeOrElasticCategoryListNameContainingOrNameContaining
+                        (query, query, query, query,query,query);
+        return elasticProductConverter
+                .convert(a);
     }
     private ElasticProduct findById(String id){
         return elasticProductRepository
